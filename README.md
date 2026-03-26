@@ -48,7 +48,7 @@ A comprehensive apartment system for the Mythic Framework, featuring interior su
 
 ### 🗺️ Supported MLOs
 The following MLOs are supported and configured out of the box:
-- **Kiya** — Kiya Apartment MLO
+- **Kiya** — Kiya Apartment MLO -- **Not TESTED**
 - **Wining** — Wining Apartment MLO
 
 ---
