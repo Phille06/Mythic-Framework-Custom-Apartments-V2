@@ -20,6 +20,8 @@ Config.BlackScreenOnWakeup = {
     fadeInTime = 1500, -- Time in milliseconds for the fade from black to visible
 }
 
+Config.SwapHeadingOnSpawn = false -- Swap heading on spawn (180 degrees from configured heading), this is useful if the spawn point faces a wall or something that you don't want the player to look at when they spawn in
+
 Config.HotelElevatorsDesc = {
     ["nexus_apartment_block_1"] = {
         [-1] = "Garage",

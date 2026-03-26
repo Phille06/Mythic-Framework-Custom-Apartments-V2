@@ -159,7 +159,11 @@ _APTS = {
 
         if pos then
             SetEntityCoords(ped, pos.x + 0.0, pos.y + 0.0, pos.z + 0.0)
-            SetEntityHeading(ped, pos.h + 0.0)
+			if Config.SwapHeadingOnSpawn then
+            	SetEntityHeading(ped, pos.h + 180.0)
+			else
+				SetEntityHeading(ped, pos.h or 0.0)
+			end
         end
 
         FreezeEntityPosition(ped, false)
