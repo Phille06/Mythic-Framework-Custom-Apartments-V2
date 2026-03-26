@@ -14,6 +14,30 @@ function SetupApartmentTargets(aptId, unit)
 	end
 
 	if p.interior.locations.logout then
+		local logoutOptions = {
+			{
+				icon      = "bed",
+				text      = "Switch Characters",
+				event     = "Apartment:Client:Logout",
+				data      = unit,
+				isEnabled = function(data)
+					return unit == LocalPlayer.state.Character:GetData("SID")
+				end,
+			},
+		}
+
+		if Config.WardrobeOnLogoutTarget and p.interior.locations.wardrobe then
+			table.insert(logoutOptions, {
+				icon      = "shirt",
+				text      = "Wardrobe",
+				event     = "Apartment:Client:Wardrobe",
+				data      = unit,
+				isEnabled = function(data)
+					return unit == LocalPlayer.state.Character:GetData("SID")
+				end,
+			})
+		end
+
 		Targeting.Zones:AddBox(
 			string.format("apt-%s-logout", aptId),
 			"bed",
@@ -21,23 +45,13 @@ function SetupApartmentTargets(aptId, unit)
 			p.interior.locations.logout.length,
 			p.interior.locations.logout.width,
 			p.interior.locations.logout.options,
-			{
-				{
-					icon      = "bed",
-					text      = "Switch Characters",
-					event     = "Apartment:Client:Logout",
-					data      = unit,
-					isEnabled = function(data)
-						return unit == LocalPlayer.state.Character:GetData("SID")
-					end,
-				},
-			},
+			logoutOptions,
 			3.0,
 			true
 		)
 	end
 
-	if needPolyzones and p.interior.locations.wardrobe then
+	if needPolyzones and p.interior.locations.wardrobe and not Config.WardrobeOnLogoutTarget then
 		Polyzone.Create:Box(
 			string.format("apt-%s-wardrobe", aptId),
 			p.interior.locations.wardrobe.coords,

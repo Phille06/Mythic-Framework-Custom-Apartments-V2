@@ -75,7 +75,6 @@ AddEventHandler("Core:Shared:Ready", function()
 		end
 		RetrieveComponents()
 		CreateElevatorPolyzones()
-		SetupWorldZones()
 		SetupReceptionPed()
 		CreateThread(function()
 			Wait(5000)
@@ -153,6 +152,18 @@ _APTS = {
 		end
 		return nil
 	end,
+
+	WakeUp = function(self, pos)
+        local ped = PlayerPedId()
+        FreezeEntityPosition(ped, true)
+
+        if pos then
+            SetEntityCoords(ped, pos.x + 0.0, pos.y + 0.0, pos.z + 0.0)
+            SetEntityHeading(ped, pos.h + 0.0)
+        end
+
+        FreezeEntityPosition(ped, false)
+    end,
 
 	Extras = {
 		Stash = function(self)

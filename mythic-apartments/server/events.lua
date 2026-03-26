@@ -129,15 +129,18 @@ RegisterNetEvent("Apartment:Server:LogoutCleanup", function()
 end)
 
 AddEventHandler("Characters:Created", function(source, charData)
+	print("[Apartment] Characters:Created fired for SID:", charData.SID, "ID:", charData.ID)
 	if not _aptData or #_aptData == 0 then
 		Logger:Warn("Apartments", "Characters:Created called but _aptData is not loaded yet")
 		return
 	end
 	local aptId = GetRandomAvailableApartment()
-	
+	print("[Apartment] Random available apartment:", aptId)
+
 	if aptId then
 		local assignResult = AssignApartmentToCharacter(aptId, charData.ID, charData.SID)
-		
+		print("[Apartment] AssignApartmentToCharacter result:", assignResult)
+
 		if assignResult then
 			if Database then
 				Database.Game:updateOne({

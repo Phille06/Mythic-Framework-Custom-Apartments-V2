@@ -4,6 +4,7 @@ AddEventHandler("Apartment:SpawnInside", function()
 end)
 
 RegisterNetEvent("Apartment:Client:InnerStuff", function(aptId, unit, wakeUp)
+	local spawnoffset = 0
 	while GlobalState[string.format("%s:Apartment", LocalPlayer.state.ID)] == nil do
 		Wait(10)
 	end
@@ -21,9 +22,30 @@ RegisterNetEvent("Apartment:Client:InnerStuff", function(aptId, unit, wakeUp)
 		QueueSpawnFloorFurniture(p.buildingName, p.floor)
 	end
 
+	if Config.BlackScreenOnWakeup and Config.BlackScreenOnWakeup.enabled and wakeUp then
+		if IsScreenFadedOut() then
+			local spawnoffset = 1500 -- Janky fix should prob refactor at somepoint
+			Wait(501)
+		end
+		while not IsScreenFadedOut() do
+			DoScreenFadeOut(1)
+			Wait(10)
+		end
+	end
+
 	TriggerEvent("Interiors:Enter", vector3(p.interior.spawn.x, p.interior.spawn.y, p.interior.spawn.z))
 
-	if wakeUp then
+	if Config.BlackScreenOnWakeup and Config.BlackScreenOnWakeup.enabled and wakeUp then
+		CreateThread(function()
+			Wait(Config.BlackScreenOnWakeup.fadeOutTime + spawnoffset)
+			if Config.BlackScreenOnWakeup.enabled and not Config.EnableWakeupAnimation then
+				Apartment:WakeUp(p.interior.wakeup)
+			end
+			DoScreenFadeIn(Config.BlackScreenOnWakeup.fadeInTime + spawnoffset)
+		end)
+	end
+
+	if Config.EnableWakeupAnimation and wakeUp then
 		SetTimeout(250, function()
 			Animations.Emotes:WakeUp(p.interior.wakeup)
 		end)

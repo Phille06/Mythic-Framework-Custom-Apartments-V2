@@ -1,4 +1,5 @@
-function SetupWorldZones()
+RegisterNetEvent("Characters:Client:Spawn")
+AddEventHandler("Characters:Client:Spawn", function()
 	local buildingBlips = {}
 
 	for k, v in ipairs(GlobalState["Apartments"]) do
@@ -20,4 +21,4 @@ function SetupWorldZones()
 			id   = apt.id,
 		}
 	end
-end
+end)

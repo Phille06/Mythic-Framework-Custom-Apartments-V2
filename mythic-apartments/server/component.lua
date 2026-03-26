@@ -525,33 +525,44 @@ _APTS = {
 
 			local oldStashName = string.format("%s-%s", characterSID, currentInvEntity)
 			local newStashName = string.format("%s-%s", characterSID, newInvEntity)
-			exports.oxmysql:update_async("UPDATE inventory SET name = ? WHERE name = ?", { newStashName, oldStashName })
 
-			Database.Game:updateOne({
-				collection = "apartment_assignments",
-				query  = { apartmentId = aptId, characterSID = characterSID },
-				update = { ["$set"] = { invEntity = newInvEntity } }
-			}, function(success)
-				if not success then
-					exports.oxmysql:update_async("UPDATE inventory SET name = ? WHERE name = ?", { oldStashName, newStashName })
-					cb({ success = false, message = "Failed to upgrade stash" })
-					return
-				end
+			-- Close any cached open stash before renaming to prevent ghost items
+			if Inventory.ForceClose then
+				Inventory:ForceClose(currentInvEntity, characterSID)
+			end
 
-				Banking.Balance:Charge(account.Account, cost, {
-					type        = "purchase",
-					title       = "Stash Upgrade",
-					description = string.format("Upgraded apartment stash to Tier %d", newInvEntity - 12),
-				})
+			-- MySQL rename must complete before MongoDB update or client notification.
+			-- Using update_async (fire-and-forget) caused a race: MongoDB could update
+			-- and the client could open the new stash before the row was renamed,
+			-- producing an empty stash or ghost items when moving items.
+			exports.oxmysql:update("UPDATE inventory SET name = ? WHERE name = ?", { newStashName, oldStashName }, function()
+				Database.Game:updateOne({
+					collection = "apartment_assignments",
+					query  = { apartmentId = aptId, characterSID = characterSID },
+					update = { ["$set"] = { invEntity = newInvEntity } }
+				}, function(success)
+					if not success then
+						-- Roll back the MySQL rename
+						exports.oxmysql:update("UPDATE inventory SET name = ? WHERE name = ?", { oldStashName, newStashName }, function() end)
+						cb({ success = false, message = "Failed to upgrade stash" })
+						return
+					end
 
-				_assignedApartments[aptId].invEntity = newInvEntity
+					Banking.Balance:Charge(account.Account, cost, {
+						type        = "purchase",
+						title       = "Stash Upgrade",
+						description = string.format("Upgraded apartment stash to Tier %d", newInvEntity - 12),
+					})
 
-				Logger:Info("Apartments", string.format(
-					"%s %s (%s) upgraded apartment %s stash to Tier %d",
-					char:GetData("First"), char:GetData("Last"), characterSID, aptId, newInvEntity - 12
-				))
+					_assignedApartments[aptId].invEntity = newInvEntity
 
-				cb({ success = true, tier = newInvEntity - 12 })
+					Logger:Info("Apartments", string.format(
+						"%s %s (%s) upgraded apartment %s stash to Tier %d",
+						char:GetData("First"), char:GetData("Last"), characterSID, aptId, newInvEntity - 12
+					))
+
+					cb({ success = true, tier = newInvEntity - 12 })
+				end)
 			end)
 		end,
 	},

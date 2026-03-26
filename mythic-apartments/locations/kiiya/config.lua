@@ -10,6 +10,16 @@ Config.ReceptionPed = {
     scenario = "WORLD_HUMAN_CLIPBOARD", -- Ped scenario/animation
 }
 
+Config.EnableWakeupAnimation = true -- Enable wakeup animation when entering apartment from outside
+
+Config.WardrobeOnLogoutTarget = false -- Add Wardrobe option to the Switch Characters target instead of using a separate walk-in polyzone
+
+Config.BlackScreenOnWakeup = {
+    enabled = false, -- Enable black screen on spawn to hide loading of interior (Recommended for this location due to the spawn location)
+    fadeOutTime = 1500, -- Time in milliseconds to hold on black screen before fading in
+    fadeInTime = 1500, -- Time in milliseconds for the fade from black to visible
+}
+
 Config.HotelElevatorsDesc = {
     ["nexus_apartment_block_1"] = {
         [-1] = "Garage",

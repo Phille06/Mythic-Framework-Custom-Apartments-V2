@@ -18,10 +18,9 @@ function RegisterMiddleware()
         if aptId > 0 then
             local assignedApt = GetCharacterApartment(characterSID)
             if not assignedApt or assignedApt ~= aptId then
-                
                 local characterID = char:GetData("ID")
                 if AssignApartmentToCharacter and AssignApartmentToCharacter(aptId, characterID, characterSID) then
-                    
+                    -- idk what to do here, the assignment should be successful and the apartment should be assigned to the character now
                 end
             end
         end
@@ -48,11 +47,11 @@ function RegisterMiddleware()
 
 	Middleware:Add("Characters:GetSpawnPoints", function(source, charId, cData)
 		local spawns = {}
-		
+
 		if cData.New then
 			return spawns
 		end
-		
+
 		local aptId = GetCharacterApartment(cData.SID)
 		if aptId and aptId > 0 then
 			local apt = _aptData[aptId]
